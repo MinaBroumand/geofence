@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Leaflet Map with Line</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+    />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <style>
+      #map {
+        height: 600px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script>
+      // Function to get query parameters
+      function getQueryParams() {
+        const params = {};
+        const queryString = window.location.search.substring(1);
+        const pairs = queryString.split("&");
+        for (let pair of pairs) {
+          const [key, value] = pair.split("=");
+          params[decodeURIComponent(key)] = decodeURIComponent(value);
+        }
+        return params;
+      }
+
+      // Get coordinates from query string
+      const queryParams = getQueryParams();
+      const lat1 = parseFloat(queryParams.lat1); // Default to San Francisco if not provided
+      const lon1 = parseFloat(queryParams.lon1); // Default to San Francisco if not provided
+      const lat2 = parseFloat(queryParams.lat2); // Default to Los Angeles if not provided
+      const lon2 = parseFloat(queryParams.lon2); // Default to Los Angeles if not provided
+      const origin = queryParams.origin || ""; // Default to Los Angeles if not provided
+      const dest = queryParams.dest || ""; // Default to Los Angeles if not provided
+
+      if (lat1 != "") {
+        // Initialize the map and set its view to the midpoint between the two points
+        const midpoint = [(lat1 + lat2) / 2, (lon1 + lon2) / 2];
+        const map = L.map("map").setView(midpoint, 6);
+
+        // Add the OpenStreetMap tiles
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          maxZoom: 19,
+          attribution:
+            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        }).addTo(map);
+
+        // Define the coordinates of the two points
+        const point1 = [lat1, lon1];
+        const point2 = [lat2, lon2];
+
+        // Add markers for the points with tooltips and popups
+        const marker1 = L.marker(point1)
+          .addTo(map)
+          .bindTooltip(origin)
+          .openTooltip()
+          .bindPopup(
+            "<b>San Francisco</b><br>Latitude: " +
+              lat1 +
+              "<br>Longitude: " +
+              lon1
+          );
+        const marker2 = L.marker(point2)
+          .addTo(map)
+          .bindTooltip(dest)
+          .openTooltip()
+          .bindPopup(
+            "<b>Los Angeles</b><br>Latitude: " + lat2 + "<br>Longitude: " + lon2
+          );
+
+        // Draw a line between the points
+        const latlngs = [point1, point2];
+        const polyline = L.polyline(latlngs, { color: "blue" }).addTo(map);
+
+        // Zoom the map to the polyline
+        map.fitBounds(polyline.getBounds());
+      }
+    </script>
+  </body>
+</html>
+
+<!-- <!DOCTYPE html>
+<html>
+  <head>
+    <title>Google Maps Draw Line Between Two Points Example</title>
+  </head>
+  <body>
+
+    <iframe
+      width="100%"
+      height="1000px"
+      frameborder="0"
+      scrolling="no"
+      marginheight="0"
+      marginwidth="0"
+      src="https://maps.google.com/maps?q=40.7128,-74.006&z=16&amp;output=embed"
+    > 
+    </iframe>
+  </body>
+</html> -->
